@@ -701,15 +701,17 @@ class NacosClient:
                 server_url = server
                 if not server_url.startswith("http"):
                     server_url = "%s://%s" % ("http", server)
+                urlencode_data = urlencode(data).encode() if data else None
+                urlencode_data_query_string = urlencode_data.decode("utf-8")
                 if python_version_bellow("3"):
-                    req = Request(url=server_url + url, data=urlencode(data).encode() if data else None,
+                    req = Request(url=server_url + url + "?" + urlencode_data_query_string, data=urlencode_data,
                                   headers=all_headers)
                     req.get_method = lambda: method
                     ctx = ssl.create_default_context()
                     ctx.check_hostname = False
                     ctx.verify_mode = ssl.CERT_NONE
                 else:
-                    req = Request(url=server_url + url, data=urlencode(data).encode() if data else None,
+                    req = Request(url=server_url + url + "?" + urlencode_data_query_string, data=urlencode_data,
                                   headers=all_headers, method=method)
                     ctx = ssl.SSLContext()
                 # build a new opener that adds proxy setting so that http request go through the proxy
